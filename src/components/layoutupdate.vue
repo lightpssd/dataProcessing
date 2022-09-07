@@ -10,13 +10,12 @@
     </div>
 
     <div class="info">
-        <el-form ref="formRef" :model="formdata" label-position="right" label-width="120px" class="demo-dynamic">
+        <el-form ref="formRef" :model="formdata" label-position="right" label-width="120px" class="demo-dynamic" >
             <h3>基础信息</h3>
             <el-row>
                 <el-col :span="8">
-                    <el-upload class="upload" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-                        multiple :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove"
-                        :limit="1" :on-exceed="handleExceed">
+                    <el-upload class="upload" action="/api/upload"
+                        :limit="1">
                         <el-button type="primary">科室底图</el-button>
                     </el-upload>
                 </el-col>
@@ -34,9 +33,10 @@
                     </div>
                 </el-col>
                 <el-col :span="16">
-                    <el-upload class="upload" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-                        multiple :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove"
-                        :limit="1" :on-exceed="handleExceed">
+                    <el-upload ref="upload" class="upload"  :limit="1" action="/api/upload" 
+                    :on-success="iconuploadsuccess" 
+                    :on-change="handleChange"
+                    >
                         <el-button type="primary">更改图标</el-button>
                     </el-upload>
                 </el-col>
@@ -67,9 +67,7 @@
                 </el-col>
             </el-row>
             <el-row>
-                <el-upload class="upload" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" multiple
-                    :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" :limit="1"
-                    :on-exceed="handleExceed">
+                <el-upload class="upload" action="/api/upload" :limit="1"  :on-change="handleChange">
                     <el-button type="primary">上传背景</el-button>
                 </el-upload>
             </el-row>
@@ -81,7 +79,7 @@
                     <el-button @click="addDomain">添加信息</el-button>
                 </el-row>
             </el-space>
-            <el-scrollbar height="330px">
+            <el-scrollbar height="310px">
                 <el-row v-for="(it,index) in formdata.domain" :key="index">
                     <el-col :span="10">
                         <el-form-item :prop="'domain.'+index+'.key'" label="键" label-width="40px" :rules="{
@@ -121,6 +119,7 @@ import {Delete} from '@element-plus/icons-vue'
 import axios from "axios";
 import VueDragResize from "vue-drag-resize/src/components/vue-drag-resize.vue";
 const formRef=ref(null)
+const upload = ref(null)
 const sf = 1920 / 1280;
 const re = [
     {
@@ -171,9 +170,6 @@ function resize(rec) {
 }
 function onActivated(item,index) {
    
-    // let _= info.find((a,index) => {
-    //     return a.id === item.id
-    // })
     info.forEach(a=>{
         a.isActive=false
     })
@@ -227,6 +223,22 @@ function addPoint(){
         domain: []
     })
     })
+}
+//icon上传
+function iconuploadsuccess(resp,file){
+    console.log(resp)
+    if(resp.code===20000){
+        formdata.value.show_image=resp.data
+    }
+    else{
+        ElMessage.error("上传失败！请重试")
+    }
+}
+
+function handleChange(file,fileList){
+    if (fileList.length > 1) {
+       fileList.splice(0, 1);//这一步，是 展示最后一次选择文件
+      }
 }
 </script>
 <style scoped>
